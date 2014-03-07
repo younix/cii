@@ -18,6 +18,7 @@
 #define H_IIVIEW
 
 #include <curses.h>
+#include <time.h>
 
 struct chat_msg {
 	char date[11];
