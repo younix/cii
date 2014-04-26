@@ -28,7 +28,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-#include "iiview.h"
+#include "cii.h"
 
 struct options {
 	int color;
@@ -138,7 +138,7 @@ draw_screen(WINDOW *msgwin, WINDOW *inwin)
 void
 usage(void)
 {
-	fprintf(stderr, "iiview PATH_TO_CHAT\n");
+	fprintf(stderr, "cii [-cl] PATH\n");
 	exit(EXIT_FAILURE);
 }
 
