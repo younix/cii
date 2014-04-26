@@ -1,5 +1,5 @@
 CC ?= cc
-CFLAGS=-std=c99 -pedantic -Wall -Wextra -fgnu89-inline
+CFLAGS=-std=c99 -pedantic -Wall -Wextra -g -fgnu89-inline
 
 .PHONY: all clean install
 .SUFFIXES: .o .c
