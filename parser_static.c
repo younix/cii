@@ -14,34 +14,35 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
-#include <time.h>
 
-#include "iiview.h"
+#include "cii.h"
 
 int
-parse_msg(char *line, struct chat_msg *chat_msg)
+parse_msg(char *msg_str, struct chat_msg *chat_msg)
 {
-	if (line == NULL || chat_msg == NULL)
+	if (msg_str == NULL || chat_msg == NULL)
 		return -1;
 
-	size_t msg_len = strlen(line);
+	size_t msg_len = strlen(msg_str);
 
 	if (msg_len < 20)
 		return -2;
 
 	/* seperate chat message from user status change */
-	if (line[17] == '-')
+	if (msg_str[17] == '-')
 		return -3;
 
-	char *user_start = strptime(line, "%F %R <", &chat_msg->tm);
+	strlcpy(chat_msg->date, msg_str, sizeof chat_msg->date);
+	strlcpy(chat_msg->time, msg_str + 11, sizeof chat_msg->time);
+	char *user_start = strchr(msg_str, '<') + 1;
 	char *user_end = strchr(user_start, '>');
 
 	if (user_start > user_end ||
-	    user_end - user_start > sizeof chat_msg->user)
+	    (size_t)(user_end - user_start) > sizeof chat_msg->user)
 		return -4;
 
 	strlcpy(chat_msg->user, user_start, (user_end - user_start) + 1);

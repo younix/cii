@@ -15,18 +15,20 @@
  */
 
 #define _XOPEN_SOURCE 500
+
+#include <curses.h>
+#include <errno.h>
 #include <fcntl.h>
+#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h> 
 #include <string.h>
-#include <errno.h>
-#include <unistd.h>
-#include <curses.h>
-#include <locale.h>
-#include <sys/types.h>
 #include <sys/time.h>
-#include <readline/readline.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 #include <readline/history.h>
+#include <readline/readline.h>
 
 #include "cii.h"
 
@@ -41,7 +43,6 @@ void
 output(WINDOW* msgwin, FILE *fh, struct options *options)
 {
 	char buf[BUFSIZ];
-	char time_buf[BUFSIZ];
 	struct chat_msg chat_msg;
 	int err;
 
@@ -54,11 +55,8 @@ output(WINDOW* msgwin, FILE *fh, struct options *options)
 		if (options->show_date)
 			wprintw(msgwin, "%s ", chat_msg.date);
 
-		if (strlen(options->time) > 0) {
-			strftime(time_buf, sizeof time_buf, options->timefstr,
-			    &chat_msg.tm);
-			wprintw(msgwin, "%s ", );
-		}
+                if (options->show_time)
+			wprintw(msgwin, "%s ", chat_msg.time);
 
 		if (options->color)
 			wcolor_set(msgwin, 2, 0);
