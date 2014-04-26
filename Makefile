@@ -1,15 +1,15 @@
 CFLAGS=-std=c99 -pedantic -Wall -Wextra -fgnu89-inline
 LFLAGS=-lcurses -lreadline
 
-iiview: iiview.c parser_static.c
-	gcc ${CFLAGS} ${LFLAGS} -o $@ iiview.c parser_static.c
+cii: cii.c parser_static.c
+	gcc ${CFLAGS} ${LFLAGS} -o $@ cii.c parser_static.c
 
 debug:
-	gdb iiview iiview.core
+	gdb cii cii.core
 
 clean:
-	rm -f iiview iiview.core
+	rm -f cii cii.core
 
-install: iiview
+install: cii
 	mkdir -p ${HOME}/bin
-	cp $> ${HOME}/bin
+	cp cii ${HOME}/bin
