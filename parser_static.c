@@ -24,10 +24,14 @@
 int
 parse_msg(char *msg_str, struct chat_msg *chat_msg)
 {
+	size_t msg_len = 0;
+	char *user_start = NULL;
+	char *user_end = NULL;
+
 	if (msg_str == NULL || chat_msg == NULL)
 		return -1;
 
-	size_t msg_len = strlen(msg_str);
+	msg_len = strlen(msg_str);
 
 	if (msg_len < 20)
 		return -2;
@@ -38,8 +42,9 @@ parse_msg(char *msg_str, struct chat_msg *chat_msg)
 
 	strlcpy(chat_msg->date, msg_str, sizeof chat_msg->date);
 	strlcpy(chat_msg->time, msg_str + 11, sizeof chat_msg->time);
-	char *user_start = strchr(msg_str, '<') + 1;
-	char *user_end = strchr(user_start, '>');
+	if ((user_start = strchr(msg_str, '<')) == NULL) return -1;
+	user_start++;
+	if ((user_end = strchr(user_start, '>')) == NULL) return -1;
 
 	if (user_start > user_end ||
 	    (size_t)(user_end - user_start) > sizeof chat_msg->user)
