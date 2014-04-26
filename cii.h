@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Jan Klemkow <j.klemkow@wemelug.de>
+ * Copyright (c) 2012-2014 Jan Klemkow <j.klemkow@wemelug.de>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,8 +14,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef H_IIVIEW
-#define H_IIVIEW
+#ifndef H_CII
+#define H_CII
 
 #include <curses.h>
 #include <time.h>
