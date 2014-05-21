@@ -105,12 +105,12 @@ void
 write_msg(char *line)
 {
 	if (access("in", W_OK) == -1)
-		fprintf(stderr, "unable to open \"int\" file for writing\n");
+		fprintf(stderr, "unable to open \"in\" file for writing\n");
 
 	FILE *fh = fopen("in", "w");
 	if (fh == NULL)
 		perror("open file 'in'");
-	fprintf(fh, "%s\n", line);
+	fprintf(fh, "%s", line);
 	fclose(fh);
 }
 
