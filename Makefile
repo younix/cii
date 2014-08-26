@@ -1,8 +1,6 @@
 CC ?= cc
-WARN=-Wno-unused-but-set-variable
 CFLAGS=-std=c99 -pedantic -Wall -Wextra -g -fgnu89-inline $(WARN)
-CFLAGS_CURSES=`pkg-config --cflags ncurses`
-LIB_CURSES=`pkg-config --libs ncurses`
+LIB_CURSES ?= -lcurses
 
 .PHONY: all clean install
 .SUFFIXES: .o .c
