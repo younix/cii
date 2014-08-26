@@ -17,7 +17,12 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+
+#if USE_LIBBSD
+#	include <bsd/string.h>
+#else
+#	include <string.h>
+#endif
 
 #include "cii.h"
 

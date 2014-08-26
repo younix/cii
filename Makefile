@@ -1,5 +1,8 @@
 CC ?= cc
-CFLAGS=-std=c99 -pedantic -Wall -Wextra -g -fgnu89-inline
+WARN=-Wno-unused-but-set-variable
+CFLAGS=-std=c99 -pedantic -Wall -Wextra -g -fgnu89-inline $(WARN)
+CFLAGS_CURSES=`pkg-config --cflags ncurses`
+LIB_CURSES=`pkg-config --libs ncurses`
 
 .PHONY: all clean install
 .SUFFIXES: .o .c
@@ -7,10 +10,10 @@ CFLAGS=-std=c99 -pedantic -Wall -Wextra -g -fgnu89-inline
 all: cii
 
 cii: cii.o parser_static.o
-	$(CC) -o $@ cii.o parser_static.o -lcurses -lreadline
+	$(CC) -o $@ cii.o parser_static.o -lreadline $(LIB_CURSES) $(LIBS_BSD)
 
 .c.o:
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) $(CFLAGS_CURSES) $(CFLAGS_BSD) $(DEFINES) -c -o $@ $<
 
 debug:
 	gdb cii cii.core

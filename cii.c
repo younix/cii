@@ -22,10 +22,16 @@
 #include <locale.h>
 #include <stdio.h>
 #include <stdlib.h> 
-#include <string.h>
+#include <unistd.h>
+
 #include <sys/time.h>
 #include <sys/types.h>
-#include <unistd.h>
+
+#ifdef USE_LIBBSD
+#	include <bsd/string.h>
+#else
+#	include <string.h>
+#endif
 
 #include <readline/history.h>
 #include <readline/readline.h>
@@ -196,7 +202,7 @@ main(int argc, char**argv)
 	curs_set(0);
 
 	/* initialize curses windows for in- and output */
-	getmaxyx(stdscr,row,col);
+	getmaxyx(stdscr, row, col);
 	msgwin = newwin(1, 1, 0, 0);
 	inwin  = newwin(1, 1, 0, 0);
 	scrollok(msgwin, TRUE);
