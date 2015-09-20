@@ -1,5 +1,5 @@
 CC ?= cc
-CFLAGS=-std=c99 -pedantic -Wall -Wextra -g -fgnu89-inline $(WARN)
+CFLAGS=-std=c99 -pedantic -Wall -Wextra -D_XOPEN_SOURCE=500 -g -fgnu89-inline $(WARN)
 LIB_CURSES ?= -lcurses
 
 .PHONY: all clean install

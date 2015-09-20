@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014 Jan Klemkow <j.klemkow@wemelug.de>
+ * Copyright (c) 2012-2015 Jan Klemkow <j.klemkow@wemelug.de>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,9 +14,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#define _XOPEN_SOURCE 500
-
 #include <curses.h>
+#include <err.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <locale.h>
@@ -44,6 +43,13 @@ struct options {
 	int show_date;
 	int show_time;
 };
+
+void
+exit_handler(void)
+{
+	if (isendwin() == FALSE)
+		endwin();
+}
 
 void
 output(WINDOW* msgwin, FILE *fh, struct options *options)
@@ -188,13 +194,17 @@ main(int argc, char**argv)
 		usage();
 
 	/* change to directory with the in and out file from ii */
-	chdir(argv[0]);
+	if (chdir(argv[0]) == -1)
+		err(EXIT_FAILURE, "chdir");
+
+	if (atexit(exit_handler) == -1)
+		err(EXIT_FAILURE, "atexit");
 
 	/* initialize curses */
-	setlocale(LC_ALL, "");
-	initscr();
-	cbreak();
-	noecho();
+	if (setlocale(LC_ALL, "") == NULL) errx(EXIT_FAILURE, "setlocale");
+	if (initscr() == NULL) errx(EXIT_FAILURE, "initscr");
+	if (cbreak() == ERR) errx(EXIT_FAILURE, "cbreak");
+	if (noecho() == ERR) errx(EXIT_FAILURE, "noecho");
 	nonl();
 	nodelay(stdscr, TRUE);
 	intrflush(stdscr, FALSE);
@@ -217,14 +227,12 @@ main(int argc, char**argv)
 
 	draw_screen(msgwin, inwin);
 
-	if (access("out", R_OK) == -1) {
-		fprintf(stderr, "unable to open \"out\" file for reading\n");
-		exit(EXIT_FAILURE);
-	}
+	if (access("out", R_OK) == -1)
+		errx(EXIT_FAILURE, "unable to open \"out\" file\n");
 
 	FILE *fh = fopen("out", "r");
 	if (fh == NULL)
-		perror("open file 'out'");
+		err(EXIT_FAILURE, "open file \"out\"");
 
 	/* jump to the end of the file cause we just print new messages */
 	if (options->show_log == 0)
@@ -243,17 +251,15 @@ main(int argc, char**argv)
 		FD_ZERO(&read_fds);
 		FD_SET(STDIN_FILENO, &read_fds);
 		if (select(STDIN_FILENO + 1, &read_fds, NULL, NULL,
-		    &sleep_time) == -1) {
-			perror("select:");
-			exit(EXIT_FAILURE);
-		}
+		    &sleep_time) == -1)
+			err(EXIT_FAILURE, "select");
 
 		if (FD_ISSET(STDIN_FILENO, &read_fds))
 			input(inwin);
 
 		output(msgwin, fh, options);
 	}
-
 	fclose(fh);
+
 	return EXIT_SUCCESS;
 }
