@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2015 Jan Klemkow <j.klemkow@wemelug.de>
+ * Copyright (c) 2012-2016 Jan Klemkow <j.klemkow@wemelug.de>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -19,6 +19,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <locale.h>
+#include <poll.h>
 #include <stdio.h>
 #include <stdlib.h> 
 #include <unistd.h>
@@ -93,7 +94,7 @@ input(WINDOW* inwin)
 
 	/*
 	 * XXX: find a better way for feeding readline or find an other lib
-	 * for user input. Main problem is that you have to type backspace
+	 * for user input.  Main problem is that you have to type backspace
 	 * two time to have one.
 	 */
 	rl_callback_read_char();
@@ -227,39 +228,47 @@ main(int argc, char**argv)
 
 	draw_screen(msgwin, inwin);
 
+	/* out file */
 	if (access("out", R_OK) == -1)
 		errx(EXIT_FAILURE, "unable to open \"out\" file\n");
 
-	FILE *fh = fopen("out", "r");
-	if (fh == NULL)
-		err(EXIT_FAILURE, "open file \"out\"");
+	/* open external source */
+	char tail_cmd[BUFSIZ];
+	snprintf(tail_cmd, sizeof tail_cmd, "exec tail -n 0 -f out");
 
-	/* jump to the end of the file cause we just print new messages */
-	if (options->show_log == 0)
-		fseek(fh, 0, SEEK_END);
+	FILE *tail_fh = NULL;
+	if ((tail_fh = popen(tail_cmd, "r")) == NULL)
+		err(EXIT_FAILURE, "unable to open pipe to tail command");
+
+//	/* jump to the end of the file cause we just print new messages */
+//	if (options->show_log == 0)
+//		fseek(fh, 0, SEEK_END);
+
+	struct pollfd pfd[2];
+	pfd[0].fd = STDIN_FILENO;
+	pfd[0].events = POLLIN;
+
+	pfd[1].fd = fileno(tail_fh);
+	pfd[1].events = POLLIN;
 
 	rl_callback_handler_install("", write_msg);
 
-	/* init select timeout for polling loop */
-	struct timeval sleep_time;
-	sleep_time.tv_sec = 0;
-	sleep_time.tv_usec = 10;
-
-	fd_set read_fds;
-
 	for (;;) {
-		FD_ZERO(&read_fds);
-		FD_SET(STDIN_FILENO, &read_fds);
-		if (select(STDIN_FILENO + 1, &read_fds, NULL, NULL,
-		    &sleep_time) == -1)
-			err(EXIT_FAILURE, "select");
+		poll(pfd, 2, INFTIM);
 
-		if (FD_ISSET(STDIN_FILENO, &read_fds))
+		/* handle tail command error and its broken pipe */
+		if (pfd[1].revents & POLLHUP)
+			break;
+
+		/* handle keyboard input */
+		if (pfd[0].revents & POLLIN)
 			input(inwin);
 
-		output(msgwin, fh, options);
+		/* handle out file input */
+		if (pfd[1].revents & POLLIN)
+			output(msgwin, tail_fh, options);
 	}
-	fclose(fh);
+	fclose(tail_fh);
 
 	return EXIT_SUCCESS;
 }
