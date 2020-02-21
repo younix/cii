@@ -45,14 +45,14 @@ struct options {
 	int show_time;
 };
 
-void
+static void
 exit_handler(void)
 {
 	if (isendwin() == FALSE)
 		endwin();
 }
 
-void
+static void
 output(WINDOW* msgwin, FILE *fh, struct options *options)
 {
 	char buf[BUFSIZ];
@@ -87,7 +87,7 @@ output(WINDOW* msgwin, FILE *fh, struct options *options)
 }
 
 /* handls the input from the user and print the input line out */
-void
+static void
 input(WINDOW* inwin)
 {
 	int row, col;
@@ -114,7 +114,7 @@ input(WINDOW* inwin)
 	wrefresh(inwin);
 }
 
-void
+static void
 write_msg(char *line)
 {
 	if (access("in", W_OK) == -1)
@@ -127,7 +127,7 @@ write_msg(char *line)
 	fclose(fh);
 }
 
-void
+static void
 draw_screen(WINDOW *msgwin, WINDOW *inwin)
 {
 	int row, col;
@@ -146,14 +146,14 @@ draw_screen(WINDOW *msgwin, WINDOW *inwin)
 	wrefresh(msgwin);
 }
 
-void
+static void
 usage(void)
 {
 	fprintf(stderr, "cii [-cl] PATH\n");
 	exit(EXIT_FAILURE);
 }
 
-void
+static void
 debug(char *str)
 {
 	FILE *fh = fopen("err", "a");
@@ -162,7 +162,7 @@ debug(char *str)
 }
 
 int
-main(int argc, char**argv)
+main(int argc, char *argv[])
 {
 	WINDOW* msgwin; /* curses window for chat messages */
 	WINDOW* inwin; /* curses window for user input */
@@ -240,6 +240,7 @@ main(int argc, char**argv)
 	if ((tail_fh = popen(tail_cmd, "r")) == NULL)
 		err(EXIT_FAILURE, "unable to open pipe to tail command");
 
+//XXX: fix this feature
 //	/* jump to the end of the file cause we just print new messages */
 //	if (options->show_log == 0)
 //		fseek(fh, 0, SEEK_END);
