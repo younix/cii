@@ -30,6 +30,5 @@ struct chat_msg {
 };
 
 int parse_msg(char *msg_str, struct chat_msg *chat_msg);
-void debug(char *str);
 
 #endif

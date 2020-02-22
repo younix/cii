@@ -153,6 +153,7 @@ usage(void)
 	exit(EXIT_FAILURE);
 }
 
+#if 0
 static void
 debug(char *str)
 {
@@ -160,6 +161,7 @@ debug(char *str)
 	fprintf(fh, "%s", str);
 	fclose(fh);
 }
+#endif
 
 int
 main(int argc, char *argv[])
