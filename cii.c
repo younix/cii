@@ -257,7 +257,7 @@ main(int argc, char *argv[])
 	rl_callback_handler_install("", write_msg);
 
 	for (;;) {
-		poll(pfd, 2, INFTIM);
+		poll(pfd, 2, -1);
 
 		/* handle tail command error and its broken pipe */
 		if (pfd[1].revents & POLLHUP)
