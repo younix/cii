@@ -20,5 +20,5 @@ clean:
 	rm -f *.o cii cii.core
 
 install: cii
-	mkdir -p ${HOME}/bin
-	cp cii ${HOME}/bin
+        mkdir -p /usr/local/bin
+        cp cii /usr/local/bin
